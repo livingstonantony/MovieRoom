@@ -9,6 +9,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.Composable
@@ -32,7 +33,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.ui.PlayerView
 import com.ell.movieroom.LocalAppContainer
+import com.ell.movieroom.chat.ChatScreen
 import com.ell.movieroom.utils.findActivity
+import com.ell.movieroom.utils.toVideoTimeRounded
 import com.ell.movieroom.viewmodel.MainViewModel
 
 @Composable
@@ -42,6 +45,9 @@ fun VideoPlayerScreen(
     )
 ) {
     val isPlaying by viewModel.isPlaying.collectAsState()
+    val currentDuration by viewModel.currentPosition.collectAsState()
+    val duration by viewModel.durationMs.collectAsState()
+
 
     val context = LocalContext.current
     val activity = remember { context.findActivity() }
@@ -72,7 +78,7 @@ fun VideoPlayerScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+//            .background(Color.Black)
             .safeDrawingPadding()
     ) {
         val (video, controls) = createRefs()
@@ -122,7 +128,8 @@ fun VideoPlayerScreen(
                     width = Dimension.fillToConstraints
                     height = Dimension.ratio("16:9")
                 }
-            }
+            }.
+            background(Color.Black.copy(alpha = 0.9f))
         )
 
         // ───────── CONTROLS (RIGHT SIDE / BOTTOM) ─────────
@@ -136,7 +143,7 @@ fun VideoPlayerScreen(
                     top.linkTo(parent.top)
                     end.linkTo(parent.end)
                     bottom.linkTo(parent.bottom)
-                    width = Dimension.value(200.dp)
+                    width = Dimension.value(260.dp)
                 } else {
                     top.linkTo(video.bottom)
                     start.linkTo(parent.start)
@@ -145,7 +152,7 @@ fun VideoPlayerScreen(
                 }
             }
         ) {
-            VideoControls(
+            ChatScreen(
                 isPlaying = isPlaying,
                 isLandscape = isLandscape,
                 onPickVideo = {
@@ -167,7 +174,8 @@ fun VideoPlayerScreen(
                             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                         else
                             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                }
+                },
+                duration = "${currentDuration.toVideoTimeRounded()}/${duration.toVideoTimeRounded()}"
             )
         }
     }

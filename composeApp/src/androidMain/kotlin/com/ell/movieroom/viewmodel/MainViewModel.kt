@@ -29,6 +29,10 @@ class MainViewModel(
         savedStateHandle.getStateFlow<Uri?>("videoUri", null)
     private val _durationMs = MutableStateFlow(0L)
     val durationMs = _durationMs.asStateFlow()
+
+
+    private val _currentPositionMs = MutableStateFlow(0L)
+    val currentPosition = _currentPositionMs.asStateFlow()
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
 
@@ -59,14 +63,23 @@ class MainViewModel(
                 if (state == Player.STATE_READY) {
                     _durationMs.value = player.duration
                 }
-                Log.d(TAG, "onPlaybackStateChanged: $state, position=${player.currentPosition.toVideoTimeRounded()} ms")
+                _currentPositionMs.value = player.currentPosition
+                Log.d(
+                    TAG,
+                    "onPlaybackStateChanged: $state, position=${player.currentPosition.toVideoTimeRounded()} ms"
+                )
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
                 _isPlaying.value = isPlaying
 
-                Log.d(TAG, "onIsPlayingChanged: $isPlaying, position=${player.currentPosition.toVideoTimeRounded()} ms")
+                _currentPositionMs.value = player.currentPosition
+
+                Log.d(
+                    TAG,
+                    "onIsPlayingChanged: $isPlaying, position=${player.currentPosition.toVideoTimeRounded()} ms"
+                )
             }
 
 
@@ -75,6 +88,8 @@ class MainViewModel(
                 newPosition: Player.PositionInfo,
                 reason: Int
             ) {
+                _currentPositionMs.value = player.currentPosition
+
                 Log.d(
                     TAG,
                     "onPositionDiscontinuity:Seeked to: ${newPosition.positionMs.toVideoTimeRounded()} ms"

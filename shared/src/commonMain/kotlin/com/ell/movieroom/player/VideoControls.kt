@@ -22,10 +22,10 @@ fun VideoControls(
     onPlayPause: () -> Unit,
     onSeek: () -> Unit,
     onToggleOrientation: () -> Unit,
-    modifier: Modifier = Modifier
+    duration: String = "00:50/23:00"
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
 //            .background(Color.Black.copy(alpha = 0.6f))
 //            .background(MaterialTheme.colorScheme.background)
             .padding(12.dp),
@@ -39,14 +39,14 @@ fun VideoControls(
         }
 
         // Play / Pause
-        Button(onClick = onPlayPause) {
+/*        Button(onClick = onPlayPause) {
             Text(if (isPlaying) "Pause" else "Play")
-        }
+        }*/
 
         // Seek
-        Button(onClick = onSeek) {
+/*        Button(onClick = onSeek) {
             Text("00:20")
-        }
+        }*/
 
         // Fullscreen toggle
         Button(onClick = onToggleOrientation) {
