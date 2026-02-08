@@ -1,6 +1,8 @@
 package com.ell.movieroom.routes
 
 
+import com.ell.movieroom.models.ChatMessage
+import com.ell.movieroom.models.ClientMessage
 import io.ktor.server.routing.Route
 import io.ktor.server.websocket.DefaultWebSocketServerSession
 import io.ktor.server.websocket.webSocket
@@ -8,40 +10,36 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import io.ktor.websocket.send
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.serialization.json.Json
+
 
 fun Route.registerChatRoutes() {
-    // Map each session to its device name
-    val clients = mutableMapOf<DefaultWebSocketServerSession, String>()
+    val clients = mutableSetOf<DefaultWebSocketServerSession>()
+    val json = Json { ignoreUnknownKeys = true }
 
     webSocket("/chat") {
+        clients.add(this)
         try {
-            // Step 1: Receive device name as the first message
-            val deviceNameFrame = incoming.receive() as Frame.Text
-            val deviceName = deviceNameFrame.readText()
-            clients[this] = deviceName
-            println("$deviceName connected.")
-
-            // Step 2: Listen for messages
             for (frame in incoming) {
                 if (frame is Frame.Text) {
-                    val message = frame.readText()
+                    // Decode full ChatMessage including 'from'
+                    val chatMessage = json.decodeFromString<ChatMessage>(frame.readText())
 
-                    // Broadcast to all clients
-                    clients.keys.forEach { session ->
-                        session.send("$deviceName: $message")
+                    // Broadcast to all clients exactly as sent
+                    val broadcastJson = json.encodeToString(chatMessage)
+                    clients.forEach { session ->
+                        session.send(broadcastJson)
                     }
 
-                    // Optional: log messages from Home specifically
-                    if (deviceName.equals("Home", ignoreCase = true)) {
-                        println("Message from Home: $message")
+                    // Optional: log if from Home
+                    if (chatMessage.from.equals("Home", ignoreCase = true)) {
+                        println("Message from Home: ${chatMessage.message}")
                     }
                 }
             }
         } catch (e: ClosedReceiveChannelException) {
-            println("Client disconnected: ${clients[this]}")
+            println("Client disconnected")
         } finally {
-            // Remove session when disconnected
-            println("${clients[this]} disconnected")
             clients.remove(this)
         }
     }
