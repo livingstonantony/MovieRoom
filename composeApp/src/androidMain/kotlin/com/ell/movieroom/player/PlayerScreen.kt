@@ -41,6 +41,7 @@ fun VideoPlayerScreen(
 ) {
     val videoItem by viewModel.videoItem.collectAsState()
 
+    val durationMs by viewModel.durationMs.collectAsState()
     val pickMedia =
         rememberLauncherForActivityResult(
             ActivityResultContracts.PickVisualMedia()
@@ -121,6 +122,15 @@ fun VideoPlayerScreen(
                 text = item.name,
                 modifier = Modifier.padding(16.dp)
             )
+
+            if (durationMs > 0) {
+                val min = durationMs / 1000 / 60
+                val sec = (durationMs / 1000) % 60
+                Text(
+                    text = "Duration: %02d:%02d".format(min, sec),
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
         }
     }
 }

@@ -8,7 +8,9 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import com.ell.movieroom.data.MetaDataReader
 import com.ell.movieroom.data.VideoItem
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 class MainViewModel(
@@ -19,6 +21,10 @@ class MainViewModel(
 
     private val videoUri =
         savedStateHandle.getStateFlow<Uri?>("videoUri", null)
+
+    private val _durationMs = MutableStateFlow(0L)
+    val durationMs = _durationMs.asStateFlow()
+
 
     val videoItem = videoUri
         .map { uri ->
@@ -40,6 +46,14 @@ class MainViewModel(
 
     init {
         player.prepare()
+
+        player.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(state: Int) {
+                if (state == Player.STATE_READY) {
+                    _durationMs.value = player.duration
+                }
+            }
+        })
     }
 
     fun setVideo(uri: Uri) {
