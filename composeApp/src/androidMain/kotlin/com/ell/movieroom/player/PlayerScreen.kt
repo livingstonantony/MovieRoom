@@ -1,17 +1,15 @@
 package com.ell.movieroom.player
 
 import android.content.pm.ActivityInfo
+import android.view.View
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -21,7 +19,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -51,6 +48,9 @@ fun VideoPlayerScreen(
 
     var isLandscape by rememberSaveable { mutableStateOf(false) }
 
+    // 🔥 Sync with ExoPlayer controls
+    var areSystemControlsVisible by remember { mutableStateOf(true) }
+
     val pickMedia =
         rememberLauncherForActivityResult(
             ActivityResultContracts.PickVisualMedia()
@@ -75,31 +75,7 @@ fun VideoPlayerScreen(
             .background(Color.Black)
             .safeDrawingPadding()
     ) {
-        val (topBar, video, controls) = createRefs()
-
-        // ───────── TOP BAR ─────────
-        PlayerTopBar(
-            onPickVideo = {
-                pickMedia.launch(
-                    PickVisualMediaRequest(
-                        ActivityResultContracts.PickVisualMedia.VideoOnly
-                    )
-                )
-            },
-            onExitFullscreen = if (isLandscape) {
-                {
-                    isLandscape = false
-                    activity.requestedOrientation =
-                        ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                }
-            } else null,
-            modifier = Modifier.constrainAs(topBar) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }
-        )
+        val (video, controls) = createRefs()
 
         // ───────── VIDEO ─────────
         AndroidView(
@@ -107,6 +83,12 @@ fun VideoPlayerScreen(
                 PlayerView(ctx).apply {
                     player = viewModel.player
                     useController = true
+
+                    setControllerVisibilityListener(
+                        PlayerView.ControllerVisibilityListener { visibility ->
+                            areSystemControlsVisible = visibility == View.VISIBLE
+                        }
+                    )
                 }
             },
             update = { playerView ->
@@ -115,19 +97,23 @@ fun VideoPlayerScreen(
                         playerView.onPause()
                         playerView.player?.pause()
                     }
+
                     Lifecycle.Event.ON_RESUME -> {
                         playerView.onResume()
                     }
+
                     else -> Unit
                 }
             },
             modifier = Modifier.constrainAs(video) {
-
-                top.linkTo(topBar.bottom)
+                top.linkTo(parent.top)
                 start.linkTo(parent.start)
 
                 if (isLandscape) {
-                    end.linkTo(controls.start)
+                    end.linkTo(
+                        if (areSystemControlsVisible) controls.start
+                        else parent.end
+                    )
                     bottom.linkTo(parent.bottom)
                     width = Dimension.fillToConstraints
                     height = Dimension.fillToConstraints
@@ -139,30 +125,18 @@ fun VideoPlayerScreen(
             }
         )
 
-        // ───────── CONTROLS ─────────
-        VideoControls(
-            isPlaying = isPlaying,
-            onPlayPause = {
-                if (isPlaying) viewModel.pause()
-                else viewModel.play()
-            },
-            onSeek = { viewModel.seekTo() },
-            onToggleOrientation = {
-                isLandscape = !isLandscape
-                activity.requestedOrientation =
-                    if (isLandscape)
-                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    else
-                        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            },
-            isLandscape = isLandscape,
+        // ───────── CONTROLS (RIGHT SIDE / BOTTOM) ─────────
+        AnimatedVisibility(
+            visible = areSystemControlsVisible,
+            enter = fadeIn(),
+            exit = fadeOut(),
             modifier = Modifier.constrainAs(controls) {
 
                 if (isLandscape) {
-                    top.linkTo(topBar.bottom)
+                    top.linkTo(parent.top)
                     end.linkTo(parent.end)
                     bottom.linkTo(parent.bottom)
-                    width = Dimension.value(180.dp)
+                    width = Dimension.value(200.dp)
                 } else {
                     top.linkTo(video.bottom)
                     start.linkTo(parent.start)
@@ -170,8 +144,34 @@ fun VideoPlayerScreen(
                     width = Dimension.fillToConstraints
                 }
             }
-        )
+        ) {
+            VideoControls(
+                isPlaying = isPlaying,
+                isLandscape = isLandscape,
+                onPickVideo = {
+                    pickMedia.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.VideoOnly
+                        )
+                    )
+                },
+                onPlayPause = {
+                    if (isPlaying) viewModel.pause()
+                    else viewModel.play()
+                },
+                onSeek = { viewModel.seekTo() },
+                onToggleOrientation = {
+                    isLandscape = !isLandscape
+                    activity.requestedOrientation =
+                        if (isLandscape)
+                            ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                        else
+                            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            )
+        }
     }
 }
+
 
 
