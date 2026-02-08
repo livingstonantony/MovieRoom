@@ -9,6 +9,8 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import com.ell.movieroom.data.MetaDataReader
 import com.ell.movieroom.data.VideoItem
+import com.ell.movieroom.utils.toVideoTime
+import com.ell.movieroom.utils.toVideoTimeRounded
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,14 +59,26 @@ class MainViewModel(
                 if (state == Player.STATE_READY) {
                     _durationMs.value = player.duration
                 }
-                Log.d(TAG, "onPlaybackStateChanged: $state")
+                Log.d(TAG, "onPlaybackStateChanged: $state, position=${player.currentPosition.toVideoTimeRounded()} ms")
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
                 _isPlaying.value = isPlaying
 
-                Log.d(TAG, "onIsPlayingChanged: $isPlaying")
+                Log.d(TAG, "onIsPlayingChanged: $isPlaying, position=${player.currentPosition.toVideoTimeRounded()} ms")
+            }
+
+
+            override fun onPositionDiscontinuity(
+                oldPosition: Player.PositionInfo,
+                newPosition: Player.PositionInfo,
+                reason: Int
+            ) {
+                Log.d(
+                    TAG,
+                    "onPositionDiscontinuity:Seeked to: ${newPosition.positionMs.toVideoTimeRounded()} ms"
+                )
             }
 
         })
@@ -81,7 +95,7 @@ class MainViewModel(
         player.play()
     }
 
-    fun seekTo(duration: Long = 0) {
+    fun seekTo(duration: Long = 20) {
         player.seekTo(duration * 1000L)
     }
 
