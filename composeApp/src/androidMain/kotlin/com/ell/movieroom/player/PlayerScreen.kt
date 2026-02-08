@@ -40,8 +40,10 @@ fun VideoPlayerScreen(
     )
 ) {
     val videoItem by viewModel.videoItem.collectAsState()
-
     val durationMs by viewModel.durationMs.collectAsState()
+    val isPlaying by viewModel.isPlaying.collectAsState()
+
+
     val pickMedia =
         rememberLauncherForActivityResult(
             ActivityResultContracts.PickVisualMedia()
@@ -87,6 +89,8 @@ fun VideoPlayerScreen(
             Text("Pick Video")
         }
 
+
+
         Spacer(Modifier.height(12.dp))
 
         AndroidView(
@@ -114,6 +118,28 @@ fun VideoPlayerScreen(
                 .fillMaxWidth()
                 .aspectRatio(16 / 9f)
         )
+
+        Spacer(Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                if (isPlaying) {
+                    viewModel.pause()
+                } else {
+                    viewModel.play()
+                }
+            }
+        ) {
+            Text(if (isPlaying) "Pause" else "Play")
+        }
+
+        Button(
+            onClick = {
+               viewModel.seekTo()
+            }
+        ) {
+            Text("00:20")
+        }
 
         Spacer(Modifier.height(16.dp))
 
