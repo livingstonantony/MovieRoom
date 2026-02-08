@@ -30,6 +30,9 @@ fun Application.module() {
 
     install(WebSockets) {
         pingPeriod = 15.seconds
+        timeout = 15.seconds
+        maxFrameSize = Long.MAX_VALUE
+        masking = false
     }
 
     routing {
