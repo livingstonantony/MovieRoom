@@ -12,6 +12,8 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
+import java.util.UUID
 
 
 val devices = mutableListOf<DeviceDetails>()
@@ -22,10 +24,11 @@ fun Route.deviceRoutes() {
     route("/devices") {
 
         get {
+            val broadcastJson = json.encodeToJsonElement<List<DeviceDetails>>( devices)
             call.respond(
                 mapOf(
                     "status" to "success",
-                    "devices" to devices
+                    "devices" to broadcastJson
                 )
             )
         }
@@ -34,6 +37,9 @@ fun Route.deviceRoutes() {
             val deviceDetails = call.receive<DeviceDetails>()
             println("Received device: $deviceDetails")
 
+            deviceDetails.apply {
+                deviceId = UUID.randomUUID().toString()
+            }
             devices.add(deviceDetails)
 
             messageResponseFlow.emit(devices)

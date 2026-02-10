@@ -15,18 +15,23 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import java.util.UUID
 
 val messageResponseFlow = MutableSharedFlow<List<DeviceDetails>>()
 val sharedFlow = messageResponseFlow.asSharedFlow()
 
+val chatClients = mutableSetOf<DefaultWebSocketServerSession>()
+val devicesClients = mutableSetOf<DefaultWebSocketServerSession>()
+
+val json = Json { ignoreUnknownKeys = true }
+
 fun Route.registerChatRoutes() {
-    val clients = mutableSetOf<DefaultWebSocketServerSession>()
 
 
-    val json = Json { ignoreUnknownKeys = true }
+
 
     webSocket("/chat") {
-        clients.add(this)
+        chatClients.add(this)
         try {
             for (frame in incoming) {
                 if (frame is Frame.Text) {
@@ -35,7 +40,7 @@ fun Route.registerChatRoutes() {
 
                     // Broadcast to all clients exactly as sent
                     val broadcastJson = json.encodeToString(chatMessage)
-                    clients.forEach { session ->
+                    chatClients.forEach { session ->
                         session.send(broadcastJson)
                     }
 
@@ -48,11 +53,12 @@ fun Route.registerChatRoutes() {
         } catch (e: ClosedReceiveChannelException) {
             println("Client disconnected")
         } finally {
-            clients.remove(this)
+            chatClients.remove(this)
         }
     }
 
     webSocket("/devices") {
+        devicesClients.add(this)
         val broadcastJson = json.encodeToString(mapOf("devices" to devices))
 
         send(broadcastJson)
@@ -67,11 +73,17 @@ fun Route.registerChatRoutes() {
         runCatching {
             incoming.consumeEach { frame ->
                 if (frame is Frame.Text) {
-                    clients.forEach { session ->
-                        val broadcastJson = json.encodeToString(mapOf("devices" to devices))
+                    /*                    devicesClients.forEach { session ->
+                                            val broadcastJson = json.encodeToString(mapOf("devices" to devices))
 
-                        session.send(broadcastJson)
+                                            session.send(broadcastJson)
+                                        }*/
+                    val broadcastJson = json.decodeFromString<DeviceDetails>(frame.readText())
+                    broadcastJson.apply {
+                        deviceId = UUID.randomUUID().toString()
                     }
+
+                    devices.add(broadcastJson)
 
                     messageResponseFlow.emit(devices)
 

@@ -4,7 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DeviceDetails(
-    val deviceId: String?=null,
-    val name: String?="",
-    val duration: Long?=0L,
+    var deviceId: String? = null,
+    val name: String? = "",
+    val duration: Long? = 0L,
+    val roomName: String? = null,
 )
