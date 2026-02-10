@@ -34,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.ui.PlayerView
 import com.ell.movieroom.LocalAppContainer
 import com.ell.movieroom.chat.ChatScreen
+import com.ell.movieroom.presentation.devices.DeviceViewModel
 import com.ell.movieroom.utils.findActivity
 import com.ell.movieroom.utils.toVideoTimeRounded
 import com.ell.movieroom.viewmodel.MainViewModel
@@ -42,6 +43,9 @@ import com.ell.movieroom.viewmodel.MainViewModel
 fun VideoPlayerScreen(
     viewModel: MainViewModel = viewModel(
         factory = LocalAppContainer.current.mainViewModelFactory,
+    ),
+    devicesViewModel: DeviceViewModel = viewModel(
+        factory = LocalAppContainer.current.deviceViewModel
     )
 ) {
     val isPlaying by viewModel.isPlaying.collectAsState()
@@ -111,25 +115,26 @@ fun VideoPlayerScreen(
                     else -> Unit
                 }
             },
-            modifier = Modifier.constrainAs(video) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
+            modifier = Modifier
+                .constrainAs(video) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
 
-                if (isLandscape) {
-                    end.linkTo(
-                        if (areSystemControlsVisible) controls.start
-                        else parent.end
-                    )
-                    bottom.linkTo(parent.bottom)
-                    width = Dimension.fillToConstraints
-                    height = Dimension.fillToConstraints
-                } else {
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                    height = Dimension.ratio("16:9")
+                    if (isLandscape) {
+                        end.linkTo(
+                            if (areSystemControlsVisible) controls.start
+                            else parent.end
+                        )
+                        bottom.linkTo(parent.bottom)
+                        width = Dimension.fillToConstraints
+                        height = Dimension.fillToConstraints
+                    } else {
+                        end.linkTo(parent.end)
+                        width = Dimension.fillToConstraints
+                        height = Dimension.ratio("16:9")
+                    }
                 }
-            }.
-            background(Color.Black.copy(alpha = 0.9f))
+                .background(Color.Black.copy(alpha = 0.9f))
         )
 
         // ───────── CONTROLS (RIGHT SIDE / BOTTOM) ─────────
@@ -153,6 +158,8 @@ fun VideoPlayerScreen(
             }
         ) {
             ChatScreen(
+                devicesViewModel = devicesViewModel,
+
                 isPlaying = isPlaying,
                 isLandscape = isLandscape,
                 onPickVideo = {

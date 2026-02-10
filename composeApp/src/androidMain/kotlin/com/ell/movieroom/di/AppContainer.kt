@@ -9,6 +9,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.ell.movieroom.viewmodel.MainViewModel
 import com.ell.movieroom.data.MetaDataReader
 import com.ell.movieroom.data.MetaDataReaderImpl
+import com.ell.movieroom.presentation.devices.DeviceViewModel
 
 class AppContainer(private val app: Application) {
 
@@ -21,6 +22,12 @@ class AppContainer(private val app: Application) {
                 player = player,
                 metaDataReader = metaDataReader
             )
+        }
+    }
+
+    val deviceViewModel = viewModelFactory {
+        initializer {
+            DeviceViewModel(SharedAppContainer().service)
         }
     }
     private val player: Player by lazy {
