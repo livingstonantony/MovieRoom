@@ -3,6 +3,8 @@ package com.ell.movieroom.chat
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.ell.movieroom.data.model.DeviceDetails
+import com.ell.movieroom.player.AddDeviceScreen
 import com.ell.movieroom.player.DeviceScreen
 import com.ell.movieroom.player.VideoControls
 import com.ell.movieroom.player.VideoStatus
@@ -31,6 +33,16 @@ fun ChatScreen(
             onToggleOrientation = onToggleOrientation
         )
         VideoStatus(duration = duration)
+        AddDeviceScreen(){deviceName,roomName ->
+            println("DeviceName: $deviceName")
+            devicesViewModel.addDevice(
+                DeviceDetails(
+                    name = deviceName,
+                    duration = 4000
+                )
+            )
+        }
         DeviceScreen(devicesViewModel)
+
     }
 }

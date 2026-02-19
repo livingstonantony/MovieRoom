@@ -69,6 +69,9 @@ kotlin {
             // Multiplatform Compose + ViewModel support
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+
+            implementation(libs.androidx.material.icons.core)
+            implementation(libs.material.icons.extended)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

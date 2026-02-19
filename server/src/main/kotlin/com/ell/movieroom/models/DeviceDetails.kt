@@ -9,3 +9,8 @@ data class DeviceDetails(
     val duration: Long? = 0L,
     val roomName: String? = null,
 )
+@Serializable
+data class DevicesResponse(
+    val status: String,
+    val devices: List<DeviceDetails>
+)

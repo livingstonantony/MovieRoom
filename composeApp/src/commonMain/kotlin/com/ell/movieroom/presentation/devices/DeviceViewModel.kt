@@ -4,11 +4,15 @@ package com.ell.movieroom.presentation.devices
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ell.movieroom.data.model.DeviceDetails
+import com.ell.movieroom.data.remote.DeviceApiService
 import com.ell.movieroom.data.remote.DeviceSocketService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
 class DeviceViewModel(
+    private val deviceApiService: DeviceApiService,
     private val service: DeviceSocketService
 ) : ViewModel() {
 
@@ -56,10 +60,19 @@ class DeviceViewModel(
         }
     }
 
+
     private fun stopSocket() {
         socketJob?.cancel()
         socketJob = null
         _state.update { it.copy(isConnected = false) }
+    }
+
+
+    fun addDevice(device: DeviceDetails) {
+        viewModelScope.launch {
+            deviceApiService.addDevice(device)
+
+        }
     }
 
     override fun onCleared() {

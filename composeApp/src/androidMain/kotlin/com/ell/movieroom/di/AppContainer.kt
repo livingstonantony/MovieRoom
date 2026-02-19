@@ -25,11 +25,7 @@ class AppContainer(private val app: Application) {
         }
     }
 
-    val deviceViewModel = viewModelFactory {
-        initializer {
-            DeviceViewModel(SharedAppContainer().service)
-        }
-    }
+    val deviceViewModel = SharedAppContainer().deviceViewModel
     private val player: Player by lazy {
         ExoPlayer.Builder(app)
             .build()

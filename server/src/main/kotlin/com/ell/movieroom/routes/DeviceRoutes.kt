@@ -2,6 +2,7 @@ package com.ell.movieroom.routes
 
 
 import com.ell.movieroom.models.DeviceDetails
+import com.ell.movieroom.models.DevicesResponse
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -18,17 +19,16 @@ import java.util.UUID
 
 val devices = mutableListOf<DeviceDetails>()
 
-fun Route.deviceRoutes() {
 
+fun Route.deviceRoutes() {
 
     route("/devices") {
 
         get {
-            val broadcastJson = json.encodeToJsonElement<List<DeviceDetails>>( devices)
             call.respond(
-                mapOf(
-                    "status" to "success",
-                    "devices" to broadcastJson
+                DevicesResponse(
+                    status = "success",
+                    devices = devices
                 )
             )
         }
