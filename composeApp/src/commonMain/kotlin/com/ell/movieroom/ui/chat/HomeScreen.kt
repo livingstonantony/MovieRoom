@@ -1,18 +1,16 @@
-package com.ell.movieroom.chat
+package com.ell.movieroom.ui.chat
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import com.ell.movieroom.data.model.DeviceDetails
-import com.ell.movieroom.player.AddDeviceScreen
-import com.ell.movieroom.player.DeviceScreen
-import com.ell.movieroom.player.VideoControls
-import com.ell.movieroom.player.VideoStatus
+import com.ell.movieroom.ui.player.AddDeviceScreen
+import com.ell.movieroom.ui.player.DeviceScreen
+import com.ell.movieroom.ui.player.VideoControls
+import com.ell.movieroom.ui.player.VideoStatus
 import com.ell.movieroom.presentation.devices.DeviceViewModel
-import com.ell.movieroom.utils.toVideoTimeRounded
 
 @Composable
-fun ChatScreen(
+fun HomeScreen(
     devicesViewModel: DeviceViewModel,
     isPlaying: Boolean,
     isLandscape: Boolean,
@@ -20,7 +18,8 @@ fun ChatScreen(
     onPlayPause: () -> Unit,
     onSeek: () -> Unit,
     onToggleOrientation: () -> Unit,
-    duration: String = "00:50/23:00"
+    duration: String = "00:50/23:00",
+    durationInMilliSeconds: Long
 ){
 
     Column() {
@@ -30,7 +29,8 @@ fun ChatScreen(
             onPickVideo = onPickVideo,
             onPlayPause =onPlayPause,
             onSeek =  onSeek ,
-            onToggleOrientation = onToggleOrientation
+            onToggleOrientation = onToggleOrientation,
+            durationInMilliSeconds = durationInMilliSeconds
         )
         VideoStatus(duration = duration)
         AddDeviceScreen(){deviceName,roomName ->

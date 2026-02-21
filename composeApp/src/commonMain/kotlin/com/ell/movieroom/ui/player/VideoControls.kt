@@ -1,4 +1,4 @@
-package com.ell.movieroom.player
+package com.ell.movieroom.ui.player
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +22,8 @@ fun VideoControls(
     onPlayPause: () -> Unit,
     onSeek: () -> Unit,
     onToggleOrientation: () -> Unit,
-    duration: String = "00:50/23:00"
+    duration: String = "00:50/23:00",
+    durationInMilliSeconds: Long
 ) {
     Column(
         modifier = Modifier
@@ -39,17 +40,20 @@ fun VideoControls(
         }
 
         // Play / Pause
-/*        Button(onClick = onPlayPause) {
-            Text(if (isPlaying) "Pause" else "Play")
-        }*/
+        /*        Button(onClick = onPlayPause) {
+                    Text(if (isPlaying) "Pause" else "Play")
+                }*/
 
         // Seek
-/*        Button(onClick = onSeek) {
-            Text("00:20")
-        }*/
+        /*        Button(onClick = onSeek) {
+                    Text("00:20")
+                }*/
 
         // Fullscreen toggle
-        Button(onClick = onToggleOrientation) {
+        Button(
+            onClick = onToggleOrientation,
+            enabled = durationInMilliSeconds != 0L
+        ) {
             Text(if (isLandscape) "Exit Fullscreen" else "Fullscreen")
         }
     }

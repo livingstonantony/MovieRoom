@@ -1,4 +1,4 @@
-package com.ell.movieroom.player
+package com.ell.movieroom.ui.player
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

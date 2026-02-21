@@ -1,4 +1,4 @@
-package com.ell.movieroom.player
+package com.ell.movieroom.ui.player
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 
 
 @Composable
-fun VideoStatus(duration: String = "00:50/23:00") {
+fun VideoStatus(duration: String) {
 
     Column(
         modifier = Modifier

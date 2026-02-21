@@ -9,7 +9,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.Composable
@@ -33,7 +32,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.ui.PlayerView
 import com.ell.movieroom.LocalAppContainer
-import com.ell.movieroom.chat.ChatScreen
+import com.ell.movieroom.ui.chat.HomeScreen
 import com.ell.movieroom.presentation.devices.DeviceViewModel
 import com.ell.movieroom.utils.findActivity
 import com.ell.movieroom.utils.toVideoTimeRounded
@@ -157,7 +156,7 @@ fun VideoPlayerScreen(
                 }
             }
         ) {
-            ChatScreen(
+            HomeScreen(
                 devicesViewModel = devicesViewModel,
 
                 isPlaying = isPlaying,
@@ -182,7 +181,8 @@ fun VideoPlayerScreen(
                         else
                             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 },
-                duration = "${currentDuration.toVideoTimeRounded()}/${duration.toVideoTimeRounded()}"
+                duration = "${currentDuration.toVideoTimeRounded()}/${duration.toVideoTimeRounded()}",
+                durationInMilliSeconds = duration
             )
         }
     }
