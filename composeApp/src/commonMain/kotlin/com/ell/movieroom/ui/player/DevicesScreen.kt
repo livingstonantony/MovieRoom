@@ -3,8 +3,10 @@ package com.ell.movieroom.ui.player
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -14,12 +16,14 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +37,7 @@ import com.ell.movieroom.data.model.DeviceDetails
 import com.ell.movieroom.presentation.devices.DeviceIntent
 import com.ell.movieroom.presentation.devices.DeviceState
 import com.ell.movieroom.presentation.devices.DeviceViewModel
+import com.ell.movieroom.utils.getRoomNumber
 import kotlinx.coroutines.awaitCancellation
 
 
@@ -43,7 +48,8 @@ fun DeviceScreen(
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    var isAllVideosDurationSync by remember { mutableStateOf(false) }
+    var isAllVideosDurationSync by rememberSaveable { mutableStateOf(false) }
+
 
     LaunchedEffect(lifecycle) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -53,6 +59,9 @@ fun DeviceScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+
+
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround,

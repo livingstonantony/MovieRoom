@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.ell.movieroom.utils.isEnabled
 
 @Composable
 fun VideoControls(
@@ -52,7 +53,7 @@ fun VideoControls(
         // Fullscreen toggle
         Button(
             onClick = onToggleOrientation,
-            enabled = durationInMilliSeconds != 0L
+            enabled = durationInMilliSeconds.isEnabled()
         ) {
             Text(if (isLandscape) "Exit Fullscreen" else "Fullscreen")
         }
