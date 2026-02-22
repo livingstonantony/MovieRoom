@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -38,29 +39,45 @@ import com.ell.movieroom.utils.isEnabled
 @Composable
 fun JoinRoomScreenDialogDisplay(
     modifier: Modifier,
-    enabled: Boolean = true,
+    enabled: Boolean,
     defaultRoomNumber: Int = 0,
     onAddDevice: (String, String) -> Unit
 ) {
     var displayDialog by remember { mutableStateOf(false) }
+    var roomName by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Button(onClick = {
-            displayDialog = true
-        }) {
-            Text("Join Room")
+        if (roomName.isEmpty()) {
+            Button(
+                onClick = {
+                    displayDialog = true
+                },
+                enabled = enabled && roomName.isEmpty()
+            ) {
+                Text("Join Room")
+            }
+        } else {
+            Text(
+                text = roomName,
+                style = MaterialTheme.typography.headlineMedium,
+                color = Color.DarkGray
+            )
         }
+
     }
     if (displayDialog) {
         JoinRoomScreenDialog(
             modifier = modifier,
             enabled = enabled,
             defaultRoomNumber = defaultRoomNumber,
-            onAddDevice = onAddDevice,
+            onAddDevice = { deviceName, roomNameAr ->
+                roomName = roomNameAr
+                onAddDevice(deviceName, roomNameAr)
+            },
             onClose = { displayDialog = false }
         )
     }
@@ -128,6 +145,7 @@ fun JoinRoomScreen(
                 Button(
                     onClick = {
                         roomNumber = getRoomNumber()
+                        roomName = roomNumber.toString()
                     }
                 ) {
                     Text("Create Room")
@@ -209,7 +227,6 @@ fun JoinRoomScreen(
 /**
  * Helper extension
  */
-private fun Int.isEnabled(): Boolean = this > 0
 
 @Preview(showBackground = true)
 @Composable

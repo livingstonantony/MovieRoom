@@ -87,10 +87,15 @@ fun Long.toVideoTimeRounded(): String {
 }
 
 fun Long.isEnabled(): Boolean {
-    return this != 0L
+    return this > 0L
 }
+
 fun Int.isEnabled(): Boolean {
-    return this != 0
+    return this > 0
 }
 
 fun getRoomNumber() = (100000..999999).random()
+
+fun Long.toSeconds(): Long {
+    return this / 1000
+}

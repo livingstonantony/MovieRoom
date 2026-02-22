@@ -15,6 +15,7 @@ import com.ell.movieroom.ui.player.VideoStatus
 import com.ell.movieroom.presentation.devices.DeviceViewModel
 import com.ell.movieroom.ui.player.JoinRoomScreenDialogDisplay
 import com.ell.movieroom.utils.isEnabled
+import com.ell.movieroom.utils.toSeconds
 
 @Composable
 fun HomeScreen(
@@ -42,28 +43,22 @@ fun HomeScreen(
         VideoStatus(duration = duration)
         JoinRoomScreenDialogDisplay(
             modifier = Modifier,
-            enabled = true,
-            defaultRoomNumber = 0
+            enabled =  durationInMilliSeconds.isEnabled(),
+            defaultRoomNumber = 0,
         ) { deviceName, roomName ->
             println("DeviceName: $deviceName")
             devicesViewModel.addDevice(
                 DeviceDetails(
                     name = deviceName,
-                    duration = 4000
+                    duration = durationInMilliSeconds.toSeconds(),
+                    roomName = roomName
                 )
             )
         }
-        Spacer(modifier = Modifier.height(10.dp))
 
-        Button(
-            onClick = {
-
-            },
-            enabled = durationInMilliSeconds.isEnabled()
-        ) {
-            Text("JOIN")
-        }
         DeviceScreen(devicesViewModel)
 
     }
 }
+
+

@@ -14,3 +14,6 @@ data class DevicesResponse(
     val status: String,
     val devices: List<DeviceDetails>
 )
+
+@Serializable
+data class DeleteAllResponse(val status: String, val deletedAll: Boolean)

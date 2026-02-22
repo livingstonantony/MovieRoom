@@ -1,12 +1,21 @@
 package com.ell.movieroom.viewmodel
 
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.annotation.OptIn
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.ell.movieroom.data.MetaDataReader
 import com.ell.movieroom.data.VideoItem
 import com.ell.movieroom.utils.toVideoTime
@@ -59,15 +68,29 @@ class MainViewModel(
         player.prepare()
 
         player.addListener(object : Player.Listener {
-            override fun onPlaybackStateChanged(state: Int) {
-                if (state == Player.STATE_READY) {
-                    _durationMs.value = player.duration
+
+            override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+                if (!timeline.isEmpty) {
+                    val duration = player.duration
+                    if (duration != C.TIME_UNSET) {
+                        _durationMs.value = duration
+                    }
                 }
+
+                Log.d(TAG, "duration=${player.duration}, state=${player.playbackState}")
+            }
+
+            override fun onPlaybackStateChanged(state: Int) {
+
                 _currentPositionMs.value = player.currentPosition
                 Log.d(
                     TAG,
                     "onPlaybackStateChanged: $state, position=${player.currentPosition.toVideoTimeRounded()} ms"
                 )
+                if (state == Player.STATE_READY) {
+                    val duration = player.duration
+                    Log.d("Exo", "Duration = $duration")
+                }
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -97,7 +120,9 @@ class MainViewModel(
             }
 
         })
+
     }
+
 
     fun setVideo(uri: Uri) {
         savedStateHandle["videoUri"] = uri

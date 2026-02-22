@@ -6,6 +6,7 @@ data class DeviceDetails(
     val deviceId: String? = null,
     val name: String? = "",
     val duration: Long? = 0L,
+    val roomName: String?=null
 )
 
 @Serializable

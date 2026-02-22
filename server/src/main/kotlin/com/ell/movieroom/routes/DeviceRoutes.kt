@@ -1,6 +1,7 @@
 package com.ell.movieroom.routes
 
 
+import com.ell.movieroom.models.DeleteAllResponse
 import com.ell.movieroom.models.DeviceDetails
 import com.ell.movieroom.models.DevicesResponse
 import io.ktor.server.request.receive
@@ -89,6 +90,15 @@ fun Route.deviceRoutes() {
             messageResponseFlow.emit(devices)
 
             call.respond(mapOf("status" to "success", "deletedId" to id))
+        }
+        delete("/") {
+
+            devices.clear()
+
+            messageResponseFlow.emit(devices)
+
+            call.respond(DeleteAllResponse(status = "success", deletedAll = true))
+
         }
     }
 

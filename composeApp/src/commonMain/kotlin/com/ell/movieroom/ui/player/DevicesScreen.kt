@@ -60,23 +60,21 @@ fun DeviceScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
 
+        /*    Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = {
+                    val allDevices = state.devices
+                    isAllVideosDurationSync =
+                        allDevices.all { it.duration == allDevices.firstOrNull()?.duration }
+                }) {
+                    Text("Verify")
+                }
+                Text(if (isAllVideosDurationSync) "Verified" else "Not Verified")
 
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Button(onClick = {
-                val allDevices = state.devices
-                isAllVideosDurationSync =
-                    allDevices.all { it.duration == allDevices.firstOrNull()?.duration }
-            }) {
-                Text("Verify")
-            }
-            Text(if (isAllVideosDurationSync) "Verified" else "Not Verified")
-
-        }
+            }*/
         DeviceContent(state)
     }
 }
@@ -93,14 +91,24 @@ fun DeviceContent(state: DeviceState) {
         }
 
         else -> {
-            LazyColumn {
-                itemsIndexed(
-                    items = state.devices,
-                    key = { _, device -> device.deviceId ?: "" }
-                ) { index, device ->
+            if (state.devices.isEmpty()) {
+                Text(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    text = "No devices found",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+            } else {
+                LazyColumn {
+                    itemsIndexed(
+                        items = state.devices,
+                        key = { _, device -> device.deviceId ?: "" }
+                    ) { index, device ->
 
-                    Devices(device, state.devices.firstOrNull()?.duration)
+                        Devices(device, state.devices.firstOrNull()?.duration)
 
+                    }
                 }
             }
 

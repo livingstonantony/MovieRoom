@@ -62,7 +62,7 @@ fun VideoPlayerScreen(
 
     val pickMedia =
         rememberLauncherForActivityResult(
-            ActivityResultContracts.PickVisualMedia()
+            ActivityResultContracts.OpenDocument()
         ) { uri ->
             uri?.let { viewModel.setVideo(it) }
         }
@@ -138,7 +138,7 @@ fun VideoPlayerScreen(
 
         // ───────── CONTROLS (RIGHT SIDE / BOTTOM) ─────────
         AnimatedVisibility(
-            visible = areSystemControlsVisible,
+            visible = areSystemControlsVisible || !isLandscape,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier.constrainAs(controls) {
@@ -162,11 +162,7 @@ fun VideoPlayerScreen(
                 isPlaying = isPlaying,
                 isLandscape = isLandscape,
                 onPickVideo = {
-                    pickMedia.launch(
-                        PickVisualMediaRequest(
-                            ActivityResultContracts.PickVisualMedia.VideoOnly
-                        )
-                    )
+                    pickMedia.launch(arrayOf("video/*"))
                 },
                 onPlayPause = {
                     if (isPlaying) viewModel.pause()
