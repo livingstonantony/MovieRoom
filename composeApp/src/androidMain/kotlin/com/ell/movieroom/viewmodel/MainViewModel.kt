@@ -130,14 +130,12 @@ class MainViewModel(
 
     fun setVideo(uri: Uri) {
         savedStateHandle["videoUri"] = uri
+        player.setMediaItem(MediaItem.fromUri(uri))
+        player.prepare()
 
         _fileName.value = metaDataReader
             .getMetaDataFromUri(uri)
             ?.fileName ?: "NoName"
-
-
-        player.setMediaItem(MediaItem.fromUri(uri))
-        player.prepare()
     }
 
     fun play() {

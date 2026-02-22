@@ -1,9 +1,9 @@
 package com.ell.movieroom.player
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.view.View
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,14 +27,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.ui.PlayerView
 import com.ell.movieroom.LocalAppContainer
-import com.ell.movieroom.ui.chat.HomeScreen
+import com.ell.movieroom.datastore.DataStoreViewModel
 import com.ell.movieroom.presentation.devices.DeviceViewModel
+import com.ell.movieroom.ui.chat.HomeScreen
 import com.ell.movieroom.utils.findActivity
 import com.ell.movieroom.utils.toVideoTimeRounded
 import com.ell.movieroom.viewmodel.MainViewModel
@@ -45,12 +48,17 @@ fun VideoPlayerScreen(
     ),
     devicesViewModel: DeviceViewModel = viewModel(
         factory = LocalAppContainer.current.deviceViewModelFactory
+    ),
+    dataStoreViewModel: DataStoreViewModel = viewModel(
+        factory = LocalAppContainer.current.dataStoreViewModel
     )
 ) {
     val isPlaying by viewModel.isPlaying.collectAsState()
     val currentDuration by viewModel.currentPosition.collectAsState()
     val duration by viewModel.durationMs.collectAsState()
     val fileName by viewModel.fileName.collectAsState()
+
+    val videoUri by dataStoreViewModel.savedUri.collectAsState()
 
     val context = LocalContext.current
     val activity = remember { context.findActivity() }
@@ -60,11 +68,21 @@ fun VideoPlayerScreen(
     // 🔥 Sync with ExoPlayer controls
     var areSystemControlsVisible by remember { mutableStateOf(true) }
 
+    // This effect will run on startup and whenever the videoUri changes
+/*    LaunchedEffect(videoUri) {
+        videoUri?.let { uriString ->
+            viewModel.setVideo(uriString.toUri())
+        }
+    }*/
+
     val pickMedia =
         rememberLauncherForActivityResult(
             ActivityResultContracts.OpenDocument()
         ) { uri ->
-            uri?.let { viewModel.setVideo(it) }
+            uri?.let {
+                viewModel.setVideo(it)
+//                dataStoreViewModel.onNewUriSelected(it.toString())
+            }
         }
 
     var lifecycle by remember { mutableStateOf(Lifecycle.Event.ON_CREATE) }

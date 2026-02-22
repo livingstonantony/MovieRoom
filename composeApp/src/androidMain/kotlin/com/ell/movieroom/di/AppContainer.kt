@@ -39,14 +39,6 @@ class AppContainer(private val app: Application) {
         }
     }
 
-    private val player: Player by lazy {
-        ExoPlayer.Builder(app)
-            .build()
-    }
-
-    private val metaDataReader: MetaDataReader by lazy {
-        MetaDataReaderImpl(app)
-    }
     val dataStoreViewModel = viewModelFactory {
         initializer {
 
@@ -56,17 +48,27 @@ class AppContainer(private val app: Application) {
         }
     }
 
-    lateinit var dataStore: DataStore<Preferences>
-        private set // Prevents modification from outside
-
     // A lazy-initialized repository that uses the dataStore
     val userPreferencesRepository: UserPreferencesRepository by lazy {
         UserPreferencesRepository(dataStore)
     }
 
-    // An initialization function to be called from platform-specific code
+    lateinit var dataStore: DataStore<Preferences>
+        private set
+
+
     fun init(dataStore: DataStore<Preferences>) {
         this.dataStore = dataStore
     }
+
+    private val player: Player by lazy {
+        ExoPlayer.Builder(app)
+            .build()
+    }
+
+    private val metaDataReader: MetaDataReader by lazy {
+        MetaDataReaderImpl(app)
+    }
+
 
 }

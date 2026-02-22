@@ -74,6 +74,12 @@ class DeviceViewModel(
 
         }
     }
+    fun deleteDevice(device: DeviceDetails) {
+        viewModelScope.launch {
+            deviceApiService.deleteDevice(device)
+
+        }
+    }
 
     override fun onCleared() {
         stopSocket()

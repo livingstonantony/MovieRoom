@@ -10,8 +10,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,12 +53,14 @@ fun DeviceScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        DeviceContent(state)
+        DeviceContent(state){
+            viewModel.deleteDevice(it)
+        }
     }
 }
 
 @Composable
-fun DeviceContent(state: DeviceState) {
+fun DeviceContent(state: DeviceState,onDelete: (DeviceDetails) -> Unit) {
     when {
         state.isLoading -> {
             CircularProgressIndicator()
@@ -69,8 +73,7 @@ fun DeviceContent(state: DeviceState) {
         else -> {
             if (state.devices.isEmpty()) {
                 Text(
-                    modifier = Modifier
-                        .padding(16.dp),
+                    modifier = Modifier.padding(16.dp),
                     text = "No devices found",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
@@ -79,10 +82,9 @@ fun DeviceContent(state: DeviceState) {
                 LazyColumn {
                     itemsIndexed(
                         items = state.devices,
-                        key = { _, device -> device.deviceId ?: "" }
-                    ) { index, device ->
+                        key = { _, device -> device.deviceId ?: "" }) { index, device ->
 
-                        Devices(device, state.devices.firstOrNull()?.duration)
+                        Devices(device, state.devices.firstOrNull()?.duration, onDelete = onDelete)
 
                     }
                 }
@@ -93,30 +95,33 @@ fun DeviceContent(state: DeviceState) {
 }
 
 @Composable
-fun Devices(device: DeviceDetails, duration: Long?) {
+fun Devices(device: DeviceDetails, duration: Long?, onDelete: (DeviceDetails) -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = "${device.name.orEmpty()} : ${device.duration ?: 0}",
             modifier = Modifier.padding(16.dp)
         )
         Icon(
-            imageVector =
-            if (device.duration == duration)
-                Icons.Default.Check
-            else
-                Icons.Default.Close,
+            imageVector = if (device.duration == duration) Icons.Default.Check
+            else Icons.Default.Close,
 
-            tint =
-            if (device.duration == duration)
-                Color(0xFF139A13)
-            else
-                Color.Red,
+            tint = if (device.duration == duration) Color(0xFF139A13)
+            else Color.Red,
 
             contentDescription = null
         )
+
+        IconButton(
+            onClick = {
+                onDelete(device)
+            }) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = null,
+                )
+        }
 
     }
 }
