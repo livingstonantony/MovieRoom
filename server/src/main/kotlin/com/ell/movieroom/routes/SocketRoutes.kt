@@ -2,6 +2,7 @@ package com.ell.movieroom.routes
 
 
 import com.ell.movieroom.models.ChatMessage
+import com.ell.movieroom.models.Command
 import com.ell.movieroom.models.DeviceDetails
 import io.ktor.server.routing.Route
 import io.ktor.server.websocket.DefaultWebSocketServerSession
@@ -22,13 +23,11 @@ val sharedFlow = messageResponseFlow.asSharedFlow()
 
 val chatClients = mutableSetOf<DefaultWebSocketServerSession>()
 val devicesClients = mutableSetOf<DefaultWebSocketServerSession>()
+val commandClients = mutableSetOf<DefaultWebSocketServerSession>()
 
 val json = Json { ignoreUnknownKeys = true }
 
-fun Route.registerChatRoutes() {
-
-
-
+fun Route.registerSocketRoutes() {
 
     webSocket("/chat") {
         chatClients.add(this)
@@ -54,6 +53,32 @@ fun Route.registerChatRoutes() {
             println("Client disconnected")
         } finally {
             chatClients.remove(this)
+        }
+    }
+    webSocket("/command") {
+        commandClients.add(this)
+        try {
+            for (frame in incoming) {
+                if (frame is Frame.Text) {
+                    // Decode full ChatMessage including 'from'
+                    val command = json.decodeFromString<Command>(frame.readText())
+
+                    // Broadcast to all clients exactly as sent
+                    val broadcastJson = json.encodeToString(command)
+                    commandClients.forEach { session ->
+                        session.send(broadcastJson)
+                    }
+
+                    // Optional: log if from Home
+                    if (command.from.equals("Home", ignoreCase = true)) {
+                        println("Message from Home: ${command.message}")
+                    }
+                }
+            }
+        } catch (e: ClosedReceiveChannelException) {
+            println("Client disconnected")
+        } finally {
+            commandClients.remove(this)
         }
     }
 
