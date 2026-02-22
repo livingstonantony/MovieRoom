@@ -22,6 +22,7 @@ import com.ell.movieroom.utils.toVideoTime
 import com.ell.movieroom.utils.toVideoTimeRounded
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -37,13 +38,16 @@ class MainViewModel(
     private val videoUri =
         savedStateHandle.getStateFlow<Uri?>("videoUri", null)
     private val _durationMs = MutableStateFlow(0L)
-    val durationMs = _durationMs.asStateFlow()
+    val durationMs: StateFlow<Long> = _durationMs.asStateFlow()
 
 
     private val _currentPositionMs = MutableStateFlow(0L)
-    val currentPosition = _currentPositionMs.asStateFlow()
+    val currentPosition: StateFlow<Long> = _currentPositionMs.asStateFlow()
     private val _isPlaying = MutableStateFlow(false)
-    val isPlaying = _isPlaying.asStateFlow()
+    val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
+
+    val _fileName = MutableStateFlow("")
+    val fileName: StateFlow<String> = _fileName.asStateFlow()
 
 
     val videoItem = videoUri
@@ -126,6 +130,11 @@ class MainViewModel(
 
     fun setVideo(uri: Uri) {
         savedStateHandle["videoUri"] = uri
+
+        _fileName.value = metaDataReader
+            .getMetaDataFromUri(uri)
+            ?.fileName ?: "NoName"
+
 
         player.setMediaItem(MediaItem.fromUri(uri))
         player.prepare()

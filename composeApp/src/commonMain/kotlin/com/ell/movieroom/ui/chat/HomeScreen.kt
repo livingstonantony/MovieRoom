@@ -27,7 +27,8 @@ fun HomeScreen(
     onSeek: () -> Unit,
     onToggleOrientation: () -> Unit,
     duration: String = "00:50/23:00",
-    durationInMilliSeconds: Long
+    durationInMilliSeconds: Long,
+    fileName: String
 ) {
 
     Column() {
@@ -40,7 +41,7 @@ fun HomeScreen(
             onToggleOrientation = onToggleOrientation,
             durationInMilliSeconds = durationInMilliSeconds
         )
-        VideoStatus(duration = duration)
+        VideoStatus(duration = duration,fileName=fileName)
         JoinRoomScreenDialogDisplay(
             modifier = Modifier,
             enabled =  durationInMilliSeconds.isEnabled(),

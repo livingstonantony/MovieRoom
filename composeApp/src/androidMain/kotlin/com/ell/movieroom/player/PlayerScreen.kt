@@ -50,7 +50,7 @@ fun VideoPlayerScreen(
     val isPlaying by viewModel.isPlaying.collectAsState()
     val currentDuration by viewModel.currentPosition.collectAsState()
     val duration by viewModel.durationMs.collectAsState()
-
+    val fileName by viewModel.fileName.collectAsState()
 
     val context = LocalContext.current
     val activity = remember { context.findActivity() }
@@ -178,7 +178,8 @@ fun VideoPlayerScreen(
                             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 },
                 duration = "${currentDuration.toVideoTimeRounded()}/${duration.toVideoTimeRounded()}",
-                durationInMilliSeconds = duration
+                durationInMilliSeconds = duration,
+                fileName = fileName
             )
         }
     }
