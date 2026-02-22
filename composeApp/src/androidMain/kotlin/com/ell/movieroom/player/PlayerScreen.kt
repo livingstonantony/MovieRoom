@@ -44,7 +44,7 @@ fun VideoPlayerScreen(
         factory = LocalAppContainer.current.mainViewModelFactory,
     ),
     devicesViewModel: DeviceViewModel = viewModel(
-        factory = LocalAppContainer.current.deviceViewModel
+        factory = LocalAppContainer.current.deviceViewModelFactory
     )
 ) {
     val isPlaying by viewModel.isPlaying.collectAsState()
@@ -184,6 +184,3 @@ fun VideoPlayerScreen(
         }
     }
 }
-
-
-

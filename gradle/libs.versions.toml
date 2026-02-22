@@ -24,6 +24,7 @@ compose-multiplatform-adaptive = "1.3.0-alpha04"
 compose-multiplatform-lifecycle = "2.10.0-alpha08"
 
 koin = "4.0.2" # Latest stable version
+data-store = "1.2.0"
 
 [libraries]
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
@@ -89,6 +90,10 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
 
 # Android specific (to provide Context to Ktor or SQLDelight)
 koin-android = { module = "io.insert-koin:koin-android" }
+
+androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "data-store" }
+androidx-datastore-preference = { module = "androidx.datastore:datastore-preferences", version.ref = "data-store" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -18,18 +18,17 @@ package com.ell.movieroom
 
 import android.app.Application
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.ell.movieroom.datastore.createDataStore
 import com.ell.movieroom.di.AppContainer
-import com.ell.movieroom.di.SharedAppContainer
 
 class MyAndroidApp() : Application() {
     /** AppContainer instance used by the rest of classes to obtain dependencies */
     lateinit var container: AppContainer
-    lateinit var sharedAppContainer: SharedAppContainer
 
     override fun onCreate() {
         super.onCreate()
         container = AppContainer(this)
-        sharedAppContainer = SharedAppContainer()
+        container.init(createDataStore(this))
 
     }
 }
@@ -41,8 +40,3 @@ class MyAndroidApp() : Application() {
  */
 val LocalAppContainer =
     staticCompositionLocalOf<AppContainer> { error("No AppContainer provided!") }
-
-val LocalSharedAppContainer =
-    staticCompositionLocalOf<SharedAppContainer> {
-        error("No SharedAppContainer provided")
-    }
